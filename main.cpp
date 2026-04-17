@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
 
     FileReader fileReader;
-
+//
     engine.rootContext()->setContextProperty("fileReader", &fileReader);
 
     QObject::connect(
