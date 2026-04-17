@@ -14,27 +14,29 @@ Window {
         id: openDialog
         title: "Open File"
         fileMode: FileDialog.OpenFile
-        onAccepted: {
-            placeholderText.visible = false
-            statusText.text = "Opened: " + openDialog.selectedFile
 
-            var xhr = new XMLHttpRequest()
-            xhr.open("GET", openDialog.selectedFile, false)
-            xhr.send()
-            fileText.text = xhr.responseText
+        onAccepted: {
+            var fileUrl = selectedFile
+            placeholderText.visible = false
+
+            var content = fileReader.readFile(fileUrl)
+
+            fileText.text = content
+            statusText.text = "Opened: " + fileUrl
         }
+
     }
 
     FileDialog {
         id: saveDialog
         title: "Save File"
         fileMode: FileDialog.SaveFile
+
         onAccepted: {
-            statusText.text = "Saved: " + saveDialog.selectedFile
+            statusText.text = "Saved: " + selectedFile
         }
     }
 
-    // MAIN
     Rectangle {
         id: mainBg
         anchors.fill: parent
@@ -42,7 +44,6 @@ Window {
         border.color: "#e9ecef"
         border.width: 1
 
-        // TOPBAR
         Rectangle {
             id: topBar
             width: parent.width
@@ -53,7 +54,6 @@ Window {
             border.width: 1
         }
 
-        // SIDEBAR
         Rectangle {
             id: sideBar
             width: 160
@@ -65,7 +65,6 @@ Window {
             border.width: 1
             z: 1
 
-            // HEADER
             Rectangle {
                 id: header
                 width: parent.width
@@ -73,6 +72,7 @@ Window {
                 color: "#eeeeee"
                 border.color: "#adb5bd"
                 border.width: 1
+
                 Text {
                     text: "JViewer"
                     anchors.centerIn: parent
@@ -82,7 +82,6 @@ Window {
                 }
             }
 
-            // MENU AREA
             Item {
                 anchors.top: header.bottom
                 anchors.bottom: parent.bottom
@@ -98,26 +97,32 @@ Window {
 
                     Repeater {
                         model: parent.parent.menuItems
+
                         Button {
                             text: modelData
                             width: 140
-                            palette.buttonText: "#333333"
+
                             onClicked: {
                                 if (modelData === "New File") {
+                                    fileText.text = ""
                                     placeholderText.text = "New file created"
                                     placeholderText.visible = true
                                     placeholderText.color = "#333333"
                                     placeholderText.font.italic = false
-                                } else if (modelData === "Load File") {
+                                }
+                                else if (modelData === "Load File") {
                                     openDialog.open()
-                                } else if (modelData === "Save File") {
+                                }
+                                else if (modelData === "Save File") {
                                     saveDialog.open()
-                                } else if (modelData === "Settings") {
+                                }
+                                else if (modelData === "Settings") {
                                     placeholderText.text = "Settings — coming soon"
                                     placeholderText.visible = true
                                     placeholderText.color = "#999999"
                                     placeholderText.font.italic = true
-                                } else if (modelData === "Exit") {
+                                }
+                                else if (modelData === "Exit") {
                                     Qt.quit()
                                 }
                             }
@@ -127,7 +132,6 @@ Window {
             }
         }
 
-        // TEXT BLOC
         Rectangle {
             id: contentArea
             anchors.left: sideBar.right
@@ -140,7 +144,6 @@ Window {
             border.color: "#adb5bd"
             border.width: 1
 
-            // PLACEHOLDER TEXT
             Text {
                 id: placeholderText
                 text: "Choose a file to get started or create something new"
@@ -151,16 +154,15 @@ Window {
                 width: parent.width * 0.8
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                visible: fileText.text === ""   // auto-hides when file loads
+                visible: fileText.text === ""
             }
 
-            // FILE TEXT
             ScrollView {
                 id: fileScroll
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: statusText.top   // stops above status bar
+                anchors.bottom: statusText.top
                 anchors.margins: 8
                 visible: fileText.text !== ""
 
@@ -176,7 +178,6 @@ Window {
                 }
             }
 
-            // STATUS TEXT
             Text {
                 id: statusText
                 text: ""
@@ -188,6 +189,5 @@ Window {
                 font.italic: true
             }
         }
-
     }
 }

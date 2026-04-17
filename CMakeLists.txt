@@ -16,6 +16,8 @@ qt_add_qml_module(appJViewer
     URI JViewer
     QML_FILES
         Main.qml
+        SOURCES filereader.h
+        SOURCES filereader.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
