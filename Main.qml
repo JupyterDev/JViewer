@@ -151,7 +151,29 @@ Window {
                 width: parent.width * 0.8
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                visible: true
+                visible: fileText.text === ""   // auto-hides when file loads
+            }
+
+            // FILE TEXT
+            ScrollView {
+                id: fileScroll
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: statusText.top   // stops above status bar
+                anchors.margins: 8
+                visible: fileText.text !== ""
+
+                TextArea {
+                    id: fileText
+                    text: ""
+                    color: "#333333"
+                    font.pixelSize: 12
+                    font.family: "Courier New"
+                    wrapMode: Text.WordWrap
+                    background: null
+                    readOnly: true
+                }
             }
 
             // STATUS TEXT
@@ -164,17 +186,6 @@ Window {
                 color: "#666666"
                 font.pixelSize: 11
                 font.italic: true
-            }
-
-            // FILE TEXT {
-            Text {
-                id: fileText
-                text: ""
-                anchors.top: parent.top
-                anchors.topMargin: 8
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "#666666"
-                font.pixelSize: 11
             }
         }
 
