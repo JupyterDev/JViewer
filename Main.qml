@@ -191,6 +191,17 @@ Window {
                 font.pixelSize: 11
                 font.italic: true
             }
+
+            Text {
+                id: lineCount
+                anchors.bottom: statusText.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: 11
+                color: "#888"
+
+                text: "Lines: " + fileText.text.split("\n").length
+            }
+
         }
     }
 }
