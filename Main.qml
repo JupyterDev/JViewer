@@ -55,6 +55,10 @@ Window {
 
 
 
+
+
+
+
         }
 
         Rectangle {
@@ -172,40 +176,30 @@ Window {
                 Row {
                     width: fileScroll.width
 
-                    // Line numbers column
-                    ListView {
+                    Text {
                         id: lineNumbers
-                        width: 15
-                        height: fileText.implicitHeight
-                        model: fileText.text === "" ? 0 : fileText.text.split("\n").length
-                        interactive: false
-
-                        delegate: Text {
-                            width: lineNumbers.width
-                            height: fontMetrics.height
-                            text: (index + 1)
-                            color: "#999999"
-                            font.pixelSize: 12
-                            font.family: "Courier New"
-                            horizontalAlignment: Text.AlignRight
-                            rightPadding: 10
+                        width: 40
+                        text: {
+                            var count = fileText.text === "" ? 1 : fileText.text.split("\n").length
+                            var result = ""
+                            for (var i = 1; i <= count; i++)
+                                result += i + "\n"
+                            return result
                         }
 
-                        FontMetrics {
-                            id: fontMetrics
-                            font.pixelSize: 12
-                            font.family: "Courier New"
-                        }
+                        font.pixelSize: fileText.font.pixelSize
+                        font.family: fileText.font.family
+                        lineHeight: 1.2
+                        color: "#999999"
+                        horizontalAlignment: Text.AlignRight
+                        rightPadding: 6
                     }
 
-                    // Divider
                     Rectangle {
                         width: 1
-                        height: fileText.implicitHeight
                         color: "#dddddd"
                     }
 
-                    // Text content
                     TextArea {
                         id: fileText
                         width: fileScroll.width - lineNumbers.width - 1
@@ -213,24 +207,35 @@ Window {
                         color: "#333333"
                         font.pixelSize: 12
                         font.family: "Courier New"
-                        wrapMode: Text.WordWrap
+                        wrapMode: TextArea.NoWrap   // 🔥 important for editor feel
                         background: null
                         readOnly: false
                         leftPadding: 8
+                        selectByMouse: true
                     }
                 }
             }
 
+
             Text {
                 id: statusText
-                text: ""
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "#666666"
                 font.pixelSize: 11
                 font.italic: true
+
+                text: {
+                    var cursor = fileText.cursorPosition
+                    var before = fileText.text.substring(0, cursor)
+                    var line = before.split("\n").length
+                    var col = cursor - before.lastIndexOf("\n")
+
+                    return "Ln " + line + ", Col " + col
+                }
             }
+
 
             Text {
                 id: lineCount
