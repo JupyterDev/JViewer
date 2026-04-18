@@ -169,15 +169,55 @@ Window {
                 anchors.margins: 8
                 visible: fileText.text !== ""
 
-                TextArea {
-                    id: fileText
-                    text: ""
-                    color: "#333333"
-                    font.pixelSize: 12
-                    font.family: "Courier New"
-                    wrapMode: Text.WordWrap
-                    background: null
-                    readOnly: true
+                Row {
+                    width: fileScroll.width
+
+                    // Line numbers column
+                    ListView {
+                        id: lineNumbers
+                        width: 15
+                        height: fileText.implicitHeight
+                        model: fileText.text === "" ? 0 : fileText.text.split("\n").length
+                        interactive: false
+
+                        delegate: Text {
+                            width: lineNumbers.width
+                            height: fontMetrics.height
+                            text: (index + 1)
+                            color: "#999999"
+                            font.pixelSize: 12
+                            font.family: "Courier New"
+                            horizontalAlignment: Text.AlignRight
+                            rightPadding: 10
+                        }
+
+                        FontMetrics {
+                            id: fontMetrics
+                            font.pixelSize: 12
+                            font.family: "Courier New"
+                        }
+                    }
+
+                    // Divider
+                    Rectangle {
+                        width: 1
+                        height: fileText.implicitHeight
+                        color: "#dddddd"
+                    }
+
+                    // Text content
+                    TextArea {
+                        id: fileText
+                        width: fileScroll.width - lineNumbers.width - 1
+                        text: ""
+                        color: "#333333"
+                        font.pixelSize: 12
+                        font.family: "Courier New"
+                        wrapMode: Text.WordWrap
+                        background: null
+                        readOnly: false
+                        leftPadding: 8
+                    }
                 }
             }
 
