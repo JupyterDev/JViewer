@@ -53,13 +53,60 @@ Window {
             border.color: "#adb5bd"
             border.width: 1
 
+            Row {
+                anchors.fill: parent
+                anchors.margins: 6
+                spacing: 10
 
+                TextField {
+                    id: searchField
+                    placeholderText: "Search..."
+                    width: 150
 
+                    onTextChanged: {
+                        if (text.length > 0) {
+                            var index = fileText.text.indexOf(text)
+                            if (index !== -1) {
+                                fileText.select(index, index + text.length)
+                                fileText.cursorPosition = index
+                            }
+                        }
+                    }
+                }
 
+                TextField {
+                    id: gotoLine
+                    placeholderText: "Go to line..."
+                    width: 120
 
+                    onAccepted: {
+                        var line = parseInt(text)
+                        var lines = fileText.text.split("\n")
 
+                        if (line > 0 && line <= lines.length) {
+                            var pos = 0
+                            for (var i = 0; i < line - 1; i++)
+                                pos += lines[i].length + 1
 
+                            fileText.cursorPosition = pos
+                        }
+                    }
+                }
+
+                Button {
+                    text: "Theme"
+                    onClicked: {
+                        var dark = mainBg.color === "#f8f9fa"
+
+                        mainBg.color = dark ? "#1e1e1e" : "#f8f9fa"
+                        contentArea.color = dark ? "#2b2b2b" : "#eeeeee"
+                        fileText.color = dark ? "#ffffff" : "#333333"
+                        lineNumbers.color = dark ? "#aaaaaa" : "#999999"
+                    }
+                }
+            }
         }
+
 
         Rectangle {
             id: sideBar
@@ -207,12 +254,47 @@ Window {
                         color: "#333333"
                         font.pixelSize: 12
                         font.family: "Courier New"
-                        wrapMode: TextArea.NoWrap   // 🔥 important for editor feel
+                        wrapMode: TextArea.NoWrap
                         background: null
                         readOnly: false
                         leftPadding: 8
                         selectByMouse: true
+
+                        cursorVisible: true
+                        focus: true
+                        tabStopDistance: 24
+
+                        palette {
+                            highlight: "#3399ff"
+                            highlightedText: "white"
+                        }
+
+
+
+                        //  Highlight current line
+                        Rectangle {
+                            width: parent.width
+                            height: fileText.cursorRectangle.height
+                            y: fileText.cursorRectangle.y
+                            color: "#d0e7ff"
+                            z: -1
+                        }
+
+                        //  Auto-indent
+                        Keys.onPressed: (event) => {
+                            if (event.key === Qt.Key_Return) {
+                                var cursor = fileText.cursorPosition
+                                var before = fileText.text.substring(0, cursor)
+                                var lastLine = before.split("\n").pop()
+
+                                var indent = lastLine.match(/^\s*/)[0]
+                                fileText.insert(cursor, "\n" + indent)
+
+                                event.accepted = true
+                            }
+                        }
                     }
+
                 }
             }
 
