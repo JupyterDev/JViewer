@@ -107,7 +107,7 @@ Window {
             }
         }
 
-
+//
         Rectangle {
             id: sideBar
             width: 160
