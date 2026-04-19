@@ -80,51 +80,72 @@ Window {
 
         Popup {
             id: popup
-            y: btn.height + 2
-            x: 0
+            y: btn.height + 4
             padding: 0
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
             background: Rectangle {
                 color: "#ffffff"
-                border.color: "#adb5bd"
+                border.color: "#9aa0a6"
                 border.width: 1
-                radius: 3
+                radius: 6
             }
 
             Column {
-                spacing: 0
+                width: 200
+                spacing: 2
+                padding: 4
 
                 Repeater {
                     model: dropRoot.items
 
-                    Rectangle {
-                        width: 160
-                        height: 30
-                        color: itemMouse.containsMouse ? "#e8f0fe" : "#ffffff"
+                    delegate: Item {
+                        width: parent.width
+                        height: modelData === "---" ? 8 : 30
 
-                        Text {
+                        // ── separator line ─────────────────────
+                        Rectangle {
+                            visible: modelData === "---"
+                            width: parent.width
+                            height: 1
+                            color: "#e0e0e0"
                             anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 10
-                            text: modelData
-                            color: "#333333"
-                            font.pixelSize: 12
                         }
 
-                        MouseArea {
-                            id: itemMouse
+                        // ── real item ──────────────────────────
+                        Rectangle {
+                            visible: modelData !== "---"
                             anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                popup.close()
-                                dropRoot.itemSelected(modelData)
+                            radius: 4
+                            color: mouse.containsMouse ? "#e8f0fe" : "#ffffff"
+                            border.color: "#d0d0d0"
+                            border.width: 1
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 10
+                                text: modelData
+                                color: "#333333"
+                                font.pixelSize: 12
+                            }
+
+                            MouseArea {
+                                id: mouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+
+                                onClicked: {
+                                    popup.close()
+                                    dropRoot.itemSelected(modelData)
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
     }
     // ────────────────────────────────────────────────────────────────────────
 
@@ -145,14 +166,23 @@ Window {
             border.width: 1
 
             Row {
-                anchors.fill: parent
-                anchors.margins: 6
+                //anchors.fill: parent
+                anchors.verticalCenter: parent.verticalCenter
+                x: contentArea.x + (contentArea.width - width) / 2
                 spacing: 6
 
                 TextField {
                     id: searchField
                     placeholderText: "Search..."
+                    color: "#333333"
+                    placeholderTextColor: "#999999"
                     width: 130
+
+                    background: Rectangle {
+                        color: "#ffffff"
+                        border.color: "#cccccc"
+                        radius: 4
+                    }
 
                     onTextChanged: {
                         if (text.length > 0) {
