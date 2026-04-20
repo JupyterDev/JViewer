@@ -2,19 +2,22 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Dialogs
+import QtQuick.Layouts
 
 
 
 Window {
     id: appWindow
-    width: 840
-    height: 640
+    width: 1024
+    height: 720
     visible: true
     title: qsTr("JViewer")
     color: "white"
 
     property var tabs: []
     property int currentTabIndex: -1
+
+    property string currentTab: "General"
 
     property int mouseX: 0
     property int mouseY: 0
@@ -368,9 +371,6 @@ Window {
         }
 
 
-
-
-
         Rectangle {
             id: sideBar
             width: 160
@@ -435,10 +435,7 @@ Window {
                                     saveDialog.open()
                                 }
                                 else if (modelData === "Settings") {
-                                    placeholderText.text = "Settings — coming soon"
-                                    placeholderText.visible = true
-                                    placeholderText.color = "#999999"
-                                    placeholderText.font.italic = true
+                                    appWindow.viewMode = "preferences"
                                 }
                                 else if (modelData === "Exit") {
                                     Qt.quit()
@@ -697,6 +694,395 @@ Window {
                     }
                 }
             }
+
+
+
+            Rectangle {
+                id: settingsPanel
+                anchors.fill: parent
+                visible: appWindow.viewMode === "preferences"
+                color: contentArea.color
+
+                Row {
+                    anchors.fill: parent
+                    spacing: 0
+
+                    // ── LEFT: Classic Navigation Sidebar ─────────────────────────────
+                    Rectangle {
+                        width: 180
+                        height: parent.height
+                        color: sideBar.color
+                        border.color: "#adb5bd"
+                        border.width: 1
+
+                        Column {
+                            id: navColumn
+                            anchors.fill: parent
+                            spacing: 0
+
+                            property string currentTab: "General"
+
+                            // Sidebar header
+                            Rectangle {
+                                width: parent.width
+                                height: 40
+                                color: "#eeeeee"
+                                border.color: "#adb5bd"
+                                border.width: 1
+
+                                Text {
+                                    text: "Settings"
+                                    anchors.centerIn: parent
+                                    color: "#333"
+                                    font.pixelSize: 15
+                                    font.bold: true
+                                }
+                            }
+
+                            Column {
+                                width: parent.width
+                                spacing: 4
+                                anchors.top: parent.top
+                                anchors.topMargin: 12
+                                anchors.left: parent.left
+                                anchors.leftMargin: 8
+                                anchors.right: parent.right
+                                anchors.rightMargin: 8
+
+                                Repeater {
+                                    model: ["General", "Editor", "Appearance", "Keybindings"]
+
+                                    delegate: Rectangle {
+                                        width: parent.width
+                                        height: 32
+                                        radius: 4
+                                        color: navColumn.currentTab === modelData ? "#e8f0fe" : "transparent"
+                                        border.color: navColumn.currentTab === modelData ? "#0078d4" : "transparent"
+                                        border.width: navColumn.currentTab === modelData ? 1 : 0
+
+                                        Text {
+                                            text: modelData
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 12
+                                            color: navColumn.currentTab === modelData ? "#0078d4" : "#333333"
+                                            font.pixelSize: 12
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: {
+                                                if (navColumn.currentTab !== modelData)
+                                                    parent.color = "#f0f0f0"
+                                            }
+                                            onExited: {
+                                                if (navColumn.currentTab !== modelData)
+                                                    parent.color = "transparent"
+                                            }
+                                            onClicked: navColumn.currentTab = modelData
+                                        }
+                                    }
+                                }
+                            }
+
+                            Item { height: 1; Layout.fillHeight: true }
+
+                            // Back button
+                            Button {
+                                text: "← Back to Editor"
+                                width: parent.width - 16
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 12
+
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "#333333"
+                                    font.pixelSize: 12
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+
+                                background: Rectangle {
+                                    color: "#ffffff"
+                                    border.color: "#adb5bd"
+                                    border.width: 1
+                                    radius: 4
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: "#e8f0fe"
+                                        visible: parent.parent.hovered
+                                        radius: 4
+                                    }
+                                }
+
+                                onClicked: appWindow.viewMode = "editor"
+                            }
+                        }
+                    }
+
+                    // ── RIGHT: Classic Content Area ──────────────────────────
+                    Rectangle {
+                        id: settingsContentArea
+                        width: parent.width - 180
+                        height: parent.height
+                        color: contentArea.color
+                        border.color: "#adb5bd"
+                        border.width: 1
+
+                        // Use StackLayout to show only ONE page at a time
+                        StackLayout {
+                            id: settingsStack
+                            anchors.fill: parent
+                            anchors.margins: 20
+                            currentIndex: {
+                                if (navColumn.currentTab === "General") return 0
+                                if (navColumn.currentTab === "Editor") return 1
+                                if (navColumn.currentTab === "Appearance") return 2
+                                if (navColumn.currentTab === "Keybindings") return 3
+                                return 0
+                            }
+
+                            // PAGE 0: General Settings
+                            Column {
+                                spacing: 16
+
+                                Text {
+                                    text: "General Settings"
+                                    font.pixelSize: 18
+                                    font.bold: true
+                                    color: "#333333"
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: "#adb5bd"
+                                }
+
+                                Column {
+                                    spacing: 12
+                                    width: parent.width
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Auto-save on focus lost"
+                                            checked: true
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Check for updates on startup"
+                                            checked: false
+                                        }
+                                    }
+                                }
+                            }
+
+                            // PAGE 1: Editor Settings
+                            Column {
+                                spacing: 16
+
+                                Text {
+                                    text: "Editor Configuration"
+                                    font.pixelSize: 18
+                                    font.bold: true
+                                    color: "#333333"
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: "#adb5bd"
+                                }
+
+                                Column {
+                                    spacing: 12
+                                    width: parent.width
+
+                                    Row {
+                                        spacing: 12
+                                        Text {
+                                            text: "Font Family:"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.pixelSize: 12
+                                            color: "#333333"
+                                            width: 100
+                                        }
+                                        ComboBox {
+                                            width: 180
+                                            model: ["Fira Code", "Consolas", "Courier New", "JetBrains Mono"]
+                                            currentIndex: 0
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 12
+                                        Text {
+                                            text: "Font Size:"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.pixelSize: 12
+                                            color: "#333333"
+                                            width: 100
+                                        }
+                                        SpinBox {
+                                            width: 80
+                                            value: 12
+                                            from: 8
+                                            to: 24
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Show Line Numbers"
+                                            checked: true
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Enable Code Minimap"
+                                            checked: false
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Auto-indent"
+                                            checked: true
+                                        }
+                                    }
+                                }
+                            }
+
+                            // PAGE 2: Appearance Settings
+                            Column {
+                                spacing: 16
+
+                                Text {
+                                    text: "Theme Selection"
+                                    font.pixelSize: 18
+                                    font.bold: true
+                                    color: "#333333"
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: "#adb5bd"
+                                }
+
+                                Column {
+                                    spacing: 12
+                                    width: parent.width
+
+                                    Row {
+                                        spacing: 12
+                                        Text {
+                                            text: "Theme:"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.pixelSize: 12
+                                            color: "#333333"
+                                            width: 100
+                                        }
+                                        ComboBox {
+                                            width: 200
+                                            model: ["Light Classic", "Dark Modern", "High Contrast"]
+                                            currentIndex: 0
+                                        }
+                                    }
+
+                                    Row {
+                                        spacing: 10
+                                        CheckBox {
+                                            text: "Use system theme"
+                                            checked: false
+                                        }
+                                    }
+                                }
+                            }
+
+                            // PAGE 3: Keybindings Settings
+                            Column {
+                                spacing: 16
+
+                                Text {
+                                    text: "Keyboard Shortcuts"
+                                    font.pixelSize: 18
+                                    font.bold: true
+                                    color: "#333333"
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: "#adb5bd"
+                                }
+
+                                Column {
+                                    spacing: 8
+                                    width: parent.width
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 30
+                                        color: "#eeeeee"
+                                        border.color: "#adb5bd"
+                                        border.width: 1
+
+                                        Row {
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            spacing: 20
+
+                                            Text { text: "Action"; font.bold: true; width: 150; color: "#333" }
+                                            Text { text: "Shortcut"; font.bold: true; color: "#333" }
+                                        }
+                                    }
+
+                                    Repeater {
+                                        model: [
+                                            { action: "New File", shortcut: "Ctrl+N" },
+                                            { action: "Open File", shortcut: "Ctrl+O" },
+                                            { action: "Save File", shortcut: "Ctrl+S" },
+                                            { action: "Undo", shortcut: "Ctrl+Z" },
+                                            { action: "Redo", shortcut: "Ctrl+Y" },
+                                            { action: "Find", shortcut: "Ctrl+F" },
+                                            { action: "Go to Line", shortcut: "Ctrl+G" }
+                                        ]
+
+                                        delegate: Rectangle {
+                                            width: parent.width
+                                            height: 28
+                                            color: "transparent"
+
+                                            Row {
+                                                anchors.fill: parent
+                                                anchors.margins: 8
+                                                spacing: 20
+
+                                                Text { text: modelData.action; width: 150; color: "#555"; font.pixelSize: 11 }
+                                                Text { text: modelData.shortcut; color: "#777"; font.pixelSize: 11 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
 
             Text {
