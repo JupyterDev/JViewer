@@ -691,6 +691,7 @@ Window {
                 }
             }
 
+
             Text {
                 id: statusText
                 anchors.bottom: parent.bottom
