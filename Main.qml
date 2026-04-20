@@ -13,6 +13,9 @@ Window {
     title: qsTr("JViewer")
     color: "white"
 
+    property var tabs: []
+    property int currentTabIndex: -1
+
     property int mouseX: 0
     property int mouseY: 0
 
@@ -264,13 +267,13 @@ Window {
                 // ── Format dropdown ──────────────────────────────────────
                 DropButton {
                     label: "Format"
-                    items: ["Wrap On", "Wrap Off", "Indent +", "Indent -", "UPPERCASE", "lowercase"]
+                    items: ["Wrap On", "Wrap Off", "Indent +", "Indent -", "Uppercase", "Lowercase"]
                     onItemSelected: (name) => {
                         if      (name === "Wrap On")  fileText.wrapMode = TextArea.Wrap
                         else if (name === "Wrap Off") fileText.wrapMode = TextArea.NoWrap
                         else if (name === "Indent +") fileText.tabStopDistance = fileText.tabStopDistance + 8
                         else if (name === "Indent -") { if (fileText.tabStopDistance > 8) fileText.tabStopDistance = fileText.tabStopDistance - 8 }
-                        else if (name === "UPPERCASE") {
+                        else if (name === "Uppercase") {
                             var sel = fileText.selectedText
                             if (sel.length > 0) {
                                 var s = fileText.selectionStart
@@ -280,7 +283,7 @@ Window {
                                 fileText.text = fileText.text.toUpperCase()
                             }
                         }
-                        else if (name === "lowercase") {
+                        else if (name === "Lowercase") {
                             var sel2 = fileText.selectedText
                             if (sel2.length > 0) {
                                 var s2 = fileText.selectionStart
@@ -363,6 +366,10 @@ Window {
                 }
             }
         }
+
+
+
+
 
         Rectangle {
             id: sideBar
