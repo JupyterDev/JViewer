@@ -1103,6 +1103,7 @@ Window {
                 }
             }
             //
+            //
 
             Text {
                 id: lineCount
