@@ -270,6 +270,7 @@ Window {
             } else {
                 findNext()
             }
+            //
         }
 
         function replaceAll() {
