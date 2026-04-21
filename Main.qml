@@ -271,6 +271,7 @@ Window {
                 findNext()
             }
             //
+            //
         }
 
         function replaceAll() {
