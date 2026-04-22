@@ -554,6 +554,8 @@ Window {
                 }
             }
 
+            //
+
             Column {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
